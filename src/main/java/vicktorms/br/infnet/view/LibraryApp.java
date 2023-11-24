@@ -1,6 +1,9 @@
 package vicktorms.br.infnet.view;
+import org.slf4j.Marker;
 import vicktorms.br.infnet.controller.LibraryController;
 import vicktorms.br.infnet.model.Book;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import lombok.AllArgsConstructor;
@@ -9,7 +12,9 @@ import lombok.NoArgsConstructor;
 import java.util.Scanner;
 
 public class LibraryApp {
-    private static LibraryController controller = new LibraryController();
+    private static final LibraryController controller = new LibraryController();
+    private static final Logger log = LoggerFactory.getLogger(LibraryApp.class);
+
     private static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -19,12 +24,12 @@ public class LibraryApp {
     private static void showMenu() {
         int option;
         do {
-            System.out.println("==== Menu da Biblioteca ====");
-            System.out.println("1. Adicionar Livro");
-            System.out.println("2. Remover Livro");
-            System.out.println("3. Listar Livros");
-            System.out.println("0. Sair");
-            System.out.println("Escolha uma opção: ");
+            log.info("==== Menu da Biblioteca ====");
+            log.info("1. Adicionar Livro");
+            log.info("2. Remover Livro");
+            log.info("3. Listar Livros");
+            log.info("0. Sair");
+            log.info("Escolha uma opção: ");
 
             option = sc.nextInt();
             sc.nextLine();  // Consumir a quebra de linha
@@ -40,46 +45,56 @@ public class LibraryApp {
                     listBooks();
                     break;
                 case 0:
-                    System.out.println("Saindo da aplicação. Até mais!");
+                    log.info("Saindo da aplicação. Até mais!");
                     break;
                 default:
-                    System.out.println("Opção inválida. Tente novamente.");
+                    log.info("Opção inválida. Tente novamente.");
             }
         } while (option != 0);
     }
 
     private static void addBook() {
-        System.out.println("Digite o título do Livro: ");
+        log.info("Digite o título do Livro: ");
         String title = sc.nextLine();
+        log.debug("DEBUG: " + title);
 
-        System.out.println("Digite o author do Livro: ");
+        log.info("Digite o author do Livro: ");
         String author = sc.nextLine();
+        log.debug("DEBUG: " + author);
 
-        System.out.println("Digite o ano de publicação do Livro: ");
-        int pages = sc.nextInt();
-        sc.nextLine();  // Consumir a quebra de linha
+        log.info("Digite as paginas do Livro: ");
+        int pages = 0;
+        try{
+            pages = sc.nextInt();
+            sc.nextLine();
+        }
+        catch(Exception e){
+            log.error("ERRO: Número de páginas inválido!");
+            System.exit(0);
+        }
+
 
         Book book = new Book(title, author, pages);
         controller.addBook(book);
-        System.out.println("Livro adicionado com sucesso!");
+        log.info("Livro adicionado com sucesso!");
     }
 
     private static void removeBook() {
-        System.out.println("Digite o título do Livro que deseja remover: ");
+        log.info("Digite o título do Livro que deseja remover: ");
         String titulo = sc.nextLine();
 
         if (controller.removeBook(titulo)) {
-            System.out.println("Livro removido com sucesso!");
+            log.info("Livro removido com sucesso!");
         } else {
-            System.out.println("Livro não encontrado.");
+            log.info("Livro não encontrado.");
         }
     }
 
     private static void listBooks() {
-        System.out.println("==== Lista de Livros ====");
+        log.info("==== Lista de Livros ====");
         for (Book book : controller.listBooks()) {
-            System.out.println(book.toString());
+            log.info(book.toString());
         }
-        System.out.println("=========================");
+        log.info("=========================");
     }
 }
